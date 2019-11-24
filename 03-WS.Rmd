@@ -1,0 +1,123 @@
+# WS小世界网络
+
+```{r define-WS-generation}
+generate_ring_edges <- function(n, m) {
+  expand_grid(n1 = 1:n, n2 = 1:n) %>%
+    filter(n1 < n2) %>%
+    mutate(
+      connected = if_else(
+        between(abs(n1 - n2) %% (n - m), 0, m),
+        TRUE, FALSE
+      )
+    )
+}
+generate_ws_edges <- function(n, m, p) {
+  ring_edges <- generate_ring_edges(n, m)
+  ws_edges <- ring_edges %>%
+    add_column(rewired = FALSE)
+  for (i_edge in 1:nrow(ws_edges)) {
+    edge_config <- ws_edges[i_edge, ]
+    if (with(edge_config, (n2 > n1 && n2 < n1 + m) && connected && !rewired)) {
+      if(runif(1) < p) {
+        ws_edges$rewired[i_edge] <- TRUE
+        ws_edges$connected[i_edge] <- FALSE
+        edge_to_rewire <- ws_edges %>%
+          filter(!connected) %>%
+          sample_n(1)
+        row_to_rewire <- with(
+          ws_edges,
+          n1 == edge_to_rewire$n1 & n2 == edge_to_rewire$n2
+        )
+        ws_edges$connected[row_to_rewire] <- TRUE
+        ws_edges$rewired[row_to_rewire] <- TRUE
+      }
+    }
+  }
+  ws_edges
+}
+```
+
+我们设定节点数$N$为100，邻居数目$m$为2，重连概率$p$为[0, 1]区间对数等距选取（见表\@ref(tab:config-ws)），根据Watts-Strogatz模型生成15个小世界网络。
+
+```{r config-ws}
+set.seed(20191124)
+n_nodes <- 100 # number of nodes
+n_neighbor <- 2 # number of neighbors for the regular ring
+n_p <- 15 # number of p's to generate networks
+n_rep <- 50 # number of repetitions for each type of network
+ws_config <- tibble(
+  id = 1:n_networks,
+  N = 100,
+  m = 2,
+  p = logspace(-4, 0, n_p)
+)
+ws_config %>%
+  knitr::kable(
+    digits = 4,
+    col.names = c("编号", "$N$", "$m$", "$p$"),
+    caption = "小世界网络配置"
+  )
+```
+
+```{r generate-ws, cache=TRUE}
+ring_graph <- generate_ring_edges(n_nodes, n_neighbor) %>%
+  filter(connected) %>%
+  select(n1, n2) %>%
+  as.matrix() %>%
+  graph_from_edgelist(directed = FALSE)
+ws_graphs <- ws_config %>%
+  slice(rep(row_number(), n_rep)) %>%
+  mutate(
+    ws = pmap(
+      .,
+      function(N, m, p, ...) {
+        generate_ws_edges(N, m, p) %>%
+          filter(connected) %>%
+          select(n1, n2) %>%
+          as.matrix() %>%
+          graph_from_edgelist(directed = FALSE)
+      }
+    )
+  )
+```
+
+图\@ref(fig:plot-smallworldness)中展示了`r n_rep`次随机生成的Watts-Strogatz模型网络的小世界性质相关情况。
+
+```{r plot-smallworldness, fig.cap="Watts-Strogatz模型的小世界性质。A：相对集聚系数和平均距离随着重连概率的变化趋势；B：小世界性质随着重连概率的变化趋势。"}
+C0 <- transitivity(ring_graph, "average")
+d0 <- mean_distance(ring_graph)
+graph_stats <- ws_graphs %>%
+  mutate(
+    Cp = map_dbl(
+      ws,
+      ~ transitivity(.x, "average")
+    ),
+    dp = map_dbl(ws, mean_distance),
+    `C(p)/C(0)` = Cp / C0,
+    `d(p)/d(0)` = dp / d0,
+    smallworldness = `C(p)/C(0)` / `d(p)/d(0)`
+  ) %>%
+  group_by(id, N, m, p) %>%
+  summarise(
+    `C(p)/C(0)` = mean(`C(p)/C(0)`),
+    `d(p)/d(0)` = mean(`d(p)/d(0)`),
+    smallworldness = mean(smallworldness)
+  ) %>%
+  ungroup() %>%
+  pivot_longer(`C(p)/C(0)`:`d(p)/d(0)`)
+plot_grid(
+  ggplot(graph_stats, aes(p, value, color = name)) +
+    geom_point() +
+    scale_x_log10() +
+    scale_color_few() +
+    labs(y = "") +
+    theme_few(),
+  ggplot(graph_stats, aes(p, smallworldness)) +
+    geom_point(color = "lightblue") +
+    scale_x_log10() +
+    labs(y = TeX("$\\frac{C(p)/C(0)}{d(p)/d(0)}")) +
+    theme_few(),
+  ncol = 1,
+  labels = "AUTO"
+)
+```
