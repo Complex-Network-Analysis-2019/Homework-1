@@ -70,7 +70,7 @@ plot_grid(
 )
 ```
 
-最后，情况符合预期。我们去掉了度分布值中度为0的数据，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法进行幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。注意到$p$值大于0.05，从统计意义上看，模型的拟合结果很好。也就是说经济物理学家合作网的度分布服从$\lambda$值为1.701的幂律分布。
+最后，情况符合预期。我们去掉了度分布值中度为0的数据，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法进行幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。
 
 ```{r fit-power-law}
 fit_results <- fit_power_law(fit_power_law(deg_dis$freq)) %>% 
@@ -83,3 +83,5 @@ fit_results %>%
     caption = "幂律拟合统计结果小结"
   )
 ```
+
+注意到$p$值大于0.05，从统计意义上看，模型的拟合结果很好。也就是说经济物理学家合作网的度分布服从$\lambda$值为`r round(fit_results$alpha, 3)`的幂律分布。
