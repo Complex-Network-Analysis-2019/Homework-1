@@ -43,13 +43,13 @@ generate_ws_edges <- function(n, m, p) {
 set.seed(20191124)
 n_nodes <- 100 # number of nodes
 n_neighbor <- 2 # number of neighbors for the regular ring
-n_p <- 15 # number of p's to generate networks
+n_networks <- 15 # number of network types
 n_rep <- 50 # number of repetitions for each type of network
 ws_config <- tibble(
   id = 1:n_networks,
   N = 100,
   m = 2,
-  p = logspace(-4, 0, n_p)
+  p = logspace(-4, 0, n_networks)
 )
 ws_config %>%
   knitr::kable(
