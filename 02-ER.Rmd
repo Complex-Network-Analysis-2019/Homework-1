@@ -55,7 +55,7 @@ for (i_row in 1:nrow(random_graphs)) {
       graph[[i_row]],
       layout = layout_with_kk,
       vertex.color = "black",
-      vertex.size = 4,
+      vertex.size = 1,
       vertex.label = NA,
       edge.curved = 0,
       main = str_c("N: ", n[i_row], ", p: ", round(p[i_row], 4))
