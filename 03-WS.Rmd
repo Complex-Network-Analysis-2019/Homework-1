@@ -1,5 +1,7 @@
 # WS小世界网络
 
+*用程序生成 WS 模型，并且对其小世界特性进行计算*
+
 ```{r define-WS-generation}
 generate_ring_edges <- function(n, m) {
   expand_grid(n1 = 1:n, n2 = 1:n) %>%
