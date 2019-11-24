@@ -10,6 +10,7 @@
 karate_edge_list <- read_tsv("datasets/空手道俱乐部.txt", col_names = FALSE) %>%
   as.matrix()
 karate_net <- graph_from_edgelist(karate_edge_list, directed = FALSE)
+par(mar = c(0, 0, 0, 0) + 0.1)
 plot(
   karate_net,
   layout = layout_with_kk,
@@ -43,7 +44,7 @@ knitr::kable(karate_desc, caption = "各结点的基本网络指标", digits = 2
 tibble(
   freq = degree_distribution(karate_net),
   k = seq(0, by = 1, length.out = length(freq))
-) %>% 
+) %>%
   ggplot(aes(k, freq)) +
   geom_point() +
   labs(y = "P(k)") +
