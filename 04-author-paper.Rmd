@@ -1,0 +1,73 @@
+# 实证网络探索
+
+下面我们将针对经济物理学家合作网的度分布进行幂律拟合。
+
+```{r setup-network}
+paper_authors <- read_tsv(
+  "datasets/经济物理学家合作网络/paperID_authorID.txt",
+  col_names = c("paper_id", "author_id")
+)
+author_edges <- tibble()
+papers <- unique(paper_authors$paper_id)
+for (paper in papers) {
+  authors <- paper_authors %>% 
+    filter(paper_id == paper) %>% 
+    pull(author_id)
+  if (length(authors) > 1) {
+    author_subgraph <- expand_grid(n1 = authors, n2 = authors) %>% 
+      filter(n1 < n2)
+    author_edges <- bind_rows(author_edges, author_subgraph)
+  }
+}
+author_edges <- unique(author_edges) %>% 
+  # igraph does not allow vertex id to be zero, all plus 1
+  mutate_all(~ . + 1) %>% 
+  as.matrix()
+author_graph <- graph_from_edgelist(author_edges, directed = FALSE)
+```
+
+```{r visualize-graph, fig.cap="经济物理学家合作网可视化"}
+par(mar = c(0, 0, 0, 0) + 0.1)
+plot(
+  author_graph,
+  layout = layout_nicely,
+  vertex.color = "black",
+  vertex.size = 1,
+  vertex.label = NA,
+  edge.curved = 0
+)
+```
+
+```{r visualize-degree-distribution, fig.cap="度分布图（度值为0的已去掉）。A：原始坐标轴；B：双对数坐标轴。"}
+deg_dis <- tibble(
+  freq = degree_distribution(author_graph),
+  k = seq(0, by = 1, length.out = length(freq))
+) %>% 
+  filter(k != 0)
+plot_grid(
+  ggplot(deg_dis, aes(k, freq)) +
+    geom_point(color = "lightblue") +
+    labs(y = expression(P(k))) +
+    theme_few(base_family = "Arial"),
+  ggplot(deg_dis, aes(k, freq)) +
+    geom_point(color = "lightblue") +
+    labs(y = expression(paste(log[10], P(k), sep = ""))) +
+    theme_few(base_family = "Arial") +
+    scale_x_log10() +
+    scale_y_log10(),
+  ncol = 1,
+  labels = "AUTO"
+)
+```
+
+```{r fit-power-law}
+fit_results <- fit_power_law(fit_power_law(deg_dis$freq)) %>% 
+  as_tibble()
+fit_results %>% 
+  select(alpha, logLik, KS.p) %>% 
+  knitr::kable(
+    digits = 3,
+    col.names = c("$\\lambda$", "log likelihood", "$p$"),
+    caption = "幂律拟合统计结果小结"
+  )
+```
