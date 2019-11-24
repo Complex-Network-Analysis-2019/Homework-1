@@ -1,0 +1,78 @@
+# 随机网络
+
+我们选取了N为100、500、1000的三种情况，并对三种情况分别生成平均度为1，10和15的ER随机网络。表\@ref(tab:config-ER)给出了ER随机网络配置情况，图\@ref(fig:visualize-ER)则给出了每种配置的ER随机网络的可视化图形。
+
+```{r config-ER}
+config_er <- expand_grid(
+  tibble(
+    mean_k = c(1, 10, 15)
+  ),
+  n = c(100, 500, 1000)
+) %>%
+  mutate(p = mean_k / n)
+config_er %>%
+  select(n, p, mean_k) %>%
+  knitr::kable(
+    digits = 4,
+    col.names = c("$N$", "$p$", "$<k>$"),
+    caption = "ER随机网络类型配置"
+  )
+```
+
+```{r generate-ER, cache=TRUE}
+set.seed(20191112)
+random_graphs <- config_er %>%
+  mutate(
+    graph = map2(
+      n, p, erdos.renyi.game
+    )
+  )
+```
+
+```{r visualize-ER, fig.width=6, fig.height=4, fig.cap="可视化ER随机网络"}
+par(mar = c(0, 0, 2, 0) + 0.1, mfrow = c(3, 3))
+for (i_row in 1:nrow(random_graphs)) {
+  with(
+    random_graphs,
+    plot(
+      graph[[i_row]],
+      layout = layout_with_kk,
+      vertex.color = "black",
+      vertex.size = 4,
+      vertex.label = NA,
+      edge.curved = 0,
+      main = str_c("N: ", n[i_row], ", p: ", round(p[i_row], 4))
+    )
+  )
+}
+```
+
+图\@ref(fig:degree-distribution-ER)画出了每种ER随机网络的度分布图，以及与其度分度的渐进分布的比较。可以看出来，随着节点数的增加，ER随机网络的度分度越来越接近$\lambda$值（平均值）等于度分布的泊松分布。
+
+```{r degree-distribution-ER, fig.height=4, fig.width=6, fig.cap="不同随机网络的度分布[^1]"}
+random_graphs %>%
+  mutate(
+    dat_plt = map2(
+      graph, mean_k,
+      ~ tibble(
+        freq = degree_distribution(.x),
+        k = seq(0, by = 1, length.out = length(freq)),
+        freq_expected = dpois(k, .y)
+      )
+    )
+  ) %>% 
+  unnest(dat_plt) %>% 
+  mutate(
+    n = str_c("N: ", n) %>% 
+      factor(levels = c("N: 100", "N: 500", "N: 1000")),
+    mean_k = str_c("<k>: ", mean_k)
+  ) %>% 
+  ggplot(aes(k, freq)) +
+  geom_point(color = "blue", size = 1) +
+  geom_line(aes(y = freq_expected), color = "lightblue") +
+  facet_grid(n ~ mean_k, scales = "free") +
+  labs(y = "P(k)") +
+  theme_few(base_family = "Arial", base_size = 12)
+```
+
+[^1]: 其中浅蓝色线是$\lambda$等于平均度$<k>$的泊松分布（即相应随机网络的渐进分布）。
