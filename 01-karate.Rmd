@@ -53,5 +53,5 @@ tibble(
 
 基本统计指标：
 
-* 平均度$<k>$：`r mean(karate_desc$度)`
-* 平均集聚系数$C$：`r mean(karate_desc$集聚系数)`
+* 平均度$<k>$：`r round(mean(karate_desc$度), 2)`
+* 平均集聚系数$C$：`r round(mean(karate_desc$集聚系数), 2)`
