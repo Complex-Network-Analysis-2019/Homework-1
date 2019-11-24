@@ -112,7 +112,7 @@ plot_grid(
     geom_point() +
     scale_x_log10() +
     scale_color_few() +
-    labs(y = "") +
+    labs(y = "", color = "") +
     theme_few(),
   ggplot(graph_stats, aes(p, smallworldness)) +
     geom_point(color = "lightblue") +

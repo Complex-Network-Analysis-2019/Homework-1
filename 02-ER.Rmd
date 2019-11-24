@@ -55,7 +55,7 @@ for (i_row in 1:nrow(random_graphs)) {
     random_graphs,
     plot(
       graph[[i_row]],
-      layout = layout_with_kk,
+      layout = layout_nicely,
       vertex.color = "black",
       vertex.size = 1,
       vertex.label = NA,
