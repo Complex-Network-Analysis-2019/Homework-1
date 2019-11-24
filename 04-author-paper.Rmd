@@ -2,7 +2,7 @@
 
 下面我们将针对经济物理学家合作网的度分布进行幂律拟合。
 
-```{r setup-network}
+```{r setup-author}
 paper_authors <- read_tsv(
   "datasets/经济物理学家合作网络/paperID_authorID.txt",
   col_names = c("paper_id", "author_id")
@@ -24,9 +24,15 @@ author_edges <- unique(author_edges) %>%
   mutate_all(~ . + 1) %>% 
   as.matrix()
 author_graph <- graph_from_edgelist(author_edges, directed = FALSE)
+author_graph <- delete_vertices(
+  simplify(author_graph), 
+  which(degree(author_graph) == 0)
+)
 ```
 
-```{r visualize-graph, fig.cap="经济物理学家合作网可视化"}
+图\@ref(fig:visualize-author)给出了经济物理学家合作网的可视化结果（已去除孤立节点，即度为0的节点，下同）。
+
+```{r visualize-author, fig.cap="经济物理学家合作网可视化"}
 par(mar = c(0, 0, 0, 0) + 0.1)
 plot(
   author_graph,
@@ -38,7 +44,9 @@ plot(
 )
 ```
 
-```{r visualize-degree-distribution, fig.cap="度分布图（度值为0的已去掉）。A：原始坐标轴；B：双对数坐标轴。"}
+再看看这个网络的度分布情况，图\@ref(fig:degree-distribution-author)分别给出了再原始坐标轴和双对数坐标轴下的度分布图。根据双对数情况下的分布图，可以大致看出来图形呈一条直线，因此基本适合进行幂律分布拟合。
+
+```{r degree-distribution-author, fig.cap="度分布图。A：原始坐标轴；B：双对数坐标轴。"}
 deg_dis <- tibble(
   freq = degree_distribution(author_graph),
   k = seq(0, by = 1, length.out = length(freq))
@@ -59,6 +67,8 @@ plot_grid(
   labels = "AUTO"
 )
 ```
+
+最后，情况符合预期。我们去掉了度分布值中度为0的数据，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法进行幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。注意到$p$值大于0.05，从统计意义上看，模型的拟合结果很好。也就是说经济物理学家合作网的度分布服从$\lambda$值为1.701的幂律分布。
 
 ```{r fit-power-law}
 fit_results <- fit_power_law(fit_power_law(deg_dis$freq)) %>% 
