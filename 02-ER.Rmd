@@ -16,7 +16,7 @@ generate_random_network <- function(n, p) {
     ) %>%
     filter(connected) %>%
     select(n1, n2) %>%
-    as.matrix() %>% 
+    as.matrix() %>%
     graph_from_edgelist(directed = FALSE)
 }
 ```
