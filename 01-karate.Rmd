@@ -1,0 +1,54 @@
+# 空手道俱乐部
+
+绘制空手道俱乐部的可视化图，展示网络的几种统计性质（度分布，集聚系数，介数）。
+
+## 网络可视化
+
+空手道俱乐部的可视化图如图\@ref(fig:visualize-network)。
+
+```{r visualize-network, fig.height=6, fig.width=6, fig.cap="网络可视化"}
+karate_edge_list <- read_tsv("datasets/空手道俱乐部.txt", col_names = FALSE) %>%
+  as.matrix()
+karate_net <- graph_from_edgelist(karate_edge_list, directed = FALSE)
+plot(
+  karate_net,
+  layout = layout_with_kk,
+  vertex.color = "black",
+  vertex.size = 6,
+  vertex.label.cex = 0.6,
+  vertex.label.color = "white",
+  edge.curved = 0
+)
+```
+
+## 节点网络指标
+
+空手道网络各节点的网络性质指标如表\@ref(tab:description)。
+
+```{r description}
+karate_desc <- tibble(
+  结点编号 = V(karate_net),
+  度 = degree(karate_net),
+  集聚系数 = transitivity(karate_net, "local"),
+  介数 = betweenness(karate_net)
+)
+knitr::kable(karate_desc, caption = "各结点的基本网络指标", digits = 2)
+```
+
+## 整体网络指标
+
+空手道网络的度分布图如图\@ref(fig:degree-distribution)
+
+```{r degree-distribution, fig.cap="空手道网络度分布"}
+ggplot(karate_desc, aes(度)) +
+  geom_histogram(fill = "lightblue") +
+  # scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(y = "频度") +
+  theme_pubclean(base_family = "SimHei", base_size = 12)
+```
+
+基本统计指标：
+
+* 平均度$<k>$：`r mean(karate_desc$度)`
+* 平均集聚系数$C$：`r mean(karate_desc$集聚系数)`
