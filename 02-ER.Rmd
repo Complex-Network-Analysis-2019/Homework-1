@@ -4,21 +4,18 @@
 
 ```{r define-ER-generation}
 generate_random_network <- function(n, p) {
-  edge_list <- expand_grid(n1 = 1:n, n2 = 1:n) %>%
+  expand_grid(n1 = 1:n, n2 = 1:n) %>%
     filter(n1 < n2) %>%
     mutate(
-      connected = map_lgl(
-        n1,
-        ~ if_else(
-          runif(1) < p,
-          TRUE, FALSE
-        )
+      connected = if_else(
+        runif(nrow(.)) < p,
+        TRUE, FALSE
       )
     ) %>%
     filter(connected) %>%
     select(n1, n2) %>%
-    as.matrix()
-  graph_from_edgelist(edge_list, directed = FALSE)
+    as.matrix() %>% 
+    graph_from_edgelist(directed = FALSE)
 }
 ```
 
