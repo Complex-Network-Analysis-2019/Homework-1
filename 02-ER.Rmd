@@ -2,6 +2,26 @@
 
 我们选取了N为100、500、1000的三种情况，并对三种情况分别生成平均度为1，10和15的ER随机网络。表\@ref(tab:config-ER)给出了ER随机网络配置情况，图\@ref(fig:visualize-ER)则给出了每种配置的ER随机网络的可视化图形。
 
+```{r define-ER-generation}
+generate_random_network <- function(n, p) {
+  edge_list <- expand_grid(n1 = 1:n, n2 = 1:n) %>%
+    filter(n1 < n2) %>%
+    mutate(
+      connected = map_lgl(
+        n1,
+        ~ if_else(
+          runif(1) < p,
+          TRUE, FALSE
+        )
+      )
+    ) %>%
+    filter(connected) %>%
+    select(n1, n2) %>%
+    as.matrix()
+  graph_from_edgelist(edge_list, directed = FALSE)
+}
+```
+
 ```{r config-ER}
 config_er <- expand_grid(
   tibble(
@@ -24,7 +44,7 @@ set.seed(20191112)
 random_graphs <- config_er %>%
   mutate(
     graph = map2(
-      n, p, erdos.renyi.game
+      n, p, generate_random_network
     )
   )
 ```
@@ -60,13 +80,13 @@ random_graphs %>%
         freq_expected = dpois(k, .y)
       )
     )
-  ) %>% 
-  unnest(dat_plt) %>% 
+  ) %>%
+  unnest(dat_plt) %>%
   mutate(
-    n = str_c("N: ", n) %>% 
+    n = str_c("N: ", n) %>%
       factor(levels = c("N: 100", "N: 500", "N: 1000")),
     mean_k = str_c("<k>: ", mean_k)
-  ) %>% 
+  ) %>%
   ggplot(aes(k, freq)) +
   geom_point(color = "blue", size = 1) +
   geom_line(aes(y = freq_expected), color = "lightblue") +
