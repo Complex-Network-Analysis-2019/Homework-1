@@ -39,7 +39,7 @@ generate_ws_edges <- function(n, m, p) {
 }
 ```
 
-我们设定节点数$N$为100，邻居数目$m$为2，重连概率$p$为[0, 1]区间对数等距选取（见表\@ref(tab:config-ws)），根据Watts-Strogatz模型生成15个小世界网络。
+我们设定节点数$N$为100，邻居数目$m$为2，重连概率$p$为从[0.001, 1]区间中对数等距选取的15个（见表\@ref(tab:config-ws)），以此根据Watts-Strogatz模型生成15种小世界网络。
 
 ```{r config-ws}
 set.seed(20191124)
@@ -51,7 +51,7 @@ ws_config <- tibble(
   id = 1:n_networks,
   N = 100,
   m = 2,
-  p = logspace(-4, 0, n_networks)
+  p = logspace(-3, 0, n_networks)
 )
 ws_config %>%
   knitr::kable(
