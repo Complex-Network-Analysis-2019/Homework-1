@@ -34,7 +34,7 @@ author_graph <- delete_vertices(
 
 图\@ref(fig:visualize-author)给出了经济物理学家合作网的可视化结果（已去除孤立节点，即度为0的节点，下同）。
 
-```{r visualize-author, fig.cap="经济物理学家合作网可视化"}
+```{r visualize-author, fig.width=6, fig.height=6, fig.cap="经济物理学家合作网可视化"}
 par(mar = c(0, 0, 0, 0) + 0.1)
 plot(
   author_graph,
@@ -48,7 +48,7 @@ plot(
 
 图\@ref(fig:degree-distribution-author)分别给出了在原始坐标轴和双对数坐标轴下的度分布图。根据双对数情况下的分布图，可以大致看出来图形呈一条直线，因此基本适合进行幂律分布拟合。
 
-```{r degree-distribution-author, fig.cap="度分布图。A：原始坐标轴；B：双对数坐标轴。"}
+```{r degree-distribution-author, fig.width=6, fig.height=4, fig.cap="度分布图。A：原始坐标轴；B：双对数坐标轴。"}
 deg_dis <- tibble(
   freq = degree_distribution(author_graph),
   k = seq(0, by = 1, length.out = length(freq))
