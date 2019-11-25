@@ -117,7 +117,7 @@ plot_grid(
   ggplot(graph_stats, aes(p, smallworldness)) +
     geom_point(color = "lightblue") +
     scale_x_log10() +
-    labs(y = TeX("$\\frac{C(p)/C(0)}{d(p)/d(0)}")) +
+    labs(y = TeX("$\\frac{C(p)/C(0)}{d(p)/d(0)}$")) +
     theme_few(),
   ncol = 1,
   labels = "AUTO"
