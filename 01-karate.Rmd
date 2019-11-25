@@ -48,7 +48,7 @@ tibble(
   ggplot(aes(k, freq)) +
   geom_point() +
   labs(y = "P(k)") +
-  theme_classic(base_family = "Arial", base_size = 12)
+  theme_few()
 ```
 
 基本统计指标：

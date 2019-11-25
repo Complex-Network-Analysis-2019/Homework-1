@@ -91,7 +91,7 @@ random_graphs %>%
   geom_line(aes(y = freq_expected), color = "lightblue") +
   facet_grid(n ~ mean_k, scales = "free") +
   labs(y = "P(k)") +
-  theme_few(base_family = "Arial", base_size = 12)
+  theme_few()
 ```
 
 [^1]: 其中浅蓝色线是$\lambda$等于平均度$<k>$的泊松分布（即相应随机网络的渐进分布）。

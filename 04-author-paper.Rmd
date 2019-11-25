@@ -34,11 +34,11 @@ author_graph <- delete_vertices(
 
 图\@ref(fig:visualize-author)给出了经济物理学家合作网的可视化结果（已去除孤立节点，即度为0的节点，下同）。
 
-```{r visualize-author, fig.cap="经济物理学家合作网可视化"}
+```{r visualize-author, fig.width=6, fig.height=6, fig.cap="经济物理学家合作网可视化"}
 par(mar = c(0, 0, 0, 0) + 0.1)
 plot(
   author_graph,
-  layout = layout_nicely,
+  layout = layout_with_kk,
   vertex.color = "black",
   vertex.size = 1,
   vertex.label = NA,
@@ -46,9 +46,9 @@ plot(
 )
 ```
 
-再看看这个网络的度分布情况，图\@ref(fig:degree-distribution-author)分别给出了再原始坐标轴和双对数坐标轴下的度分布图。根据双对数情况下的分布图，可以大致看出来图形呈一条直线，因此基本适合进行幂律分布拟合。
+图\@ref(fig:degree-distribution-author)分别给出了在原始坐标轴和双对数坐标轴下的度分布图。根据双对数情况下的分布图，可以大致看出来图形呈一条直线，因此基本适合进行幂律分布拟合。
 
-```{r degree-distribution-author, fig.cap="度分布图。A：原始坐标轴；B：双对数坐标轴。"}
+```{r degree-distribution-author, fig.width=6, fig.height=4, fig.cap="度分布图。A：原始坐标轴；B：双对数坐标轴。"}
 deg_dis <- tibble(
   freq = degree_distribution(author_graph),
   k = seq(0, by = 1, length.out = length(freq))
@@ -58,11 +58,11 @@ plot_grid(
   ggplot(deg_dis, aes(k, freq)) +
     geom_point(color = "lightblue") +
     labs(y = expression(P(k))) +
-    theme_few(base_family = "Arial"),
+    theme_few(),
   ggplot(deg_dis, aes(k, freq)) +
     geom_point(color = "lightblue") +
     labs(y = expression(paste(log[10], P(k), sep = ""))) +
-    theme_few(base_family = "Arial") +
+    theme_few() +
     scale_x_log10() +
     scale_y_log10(),
   ncol = 1,
@@ -70,18 +70,18 @@ plot_grid(
 )
 ```
 
-最后，情况符合预期。我们去掉了度分布值中度为0的数据，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法进行幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。
+最后，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法对网络的度分布做幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。
 
 ```{r fit-power-law}
-fit_results <- fit_power_law(fit_power_law(deg_dis$freq)) %>%
+fit_results <- fit_power_law(degree(author_graph)) %>%
   as_tibble()
 fit_results %>%
   select(alpha, logLik, KS.p) %>%
   knitr::kable(
     digits = 3,
-    col.names = c("$\\lambda$", "log likelihood", "$p$"),
+    col.names = c("$\\gamma$", "log likelihood", "$p$"),
     caption = "幂律拟合统计结果小结"
   )
 ```
 
-注意到$p$值大于0.05，从统计意义上看，模型的拟合结果很好。也就是说经济物理学家合作网的度分布服从$\lambda$值为`r round(fit_results$alpha, 3)`的幂律分布。
+注意到$p$值大于0.05，从统计意义上看，模型的拟合结果很好。所以，经济物理学家合作网的度分布服从$\gamma$值为`r round(fit_results$alpha, 3)`的幂律分布，即`r str_glue("$P(k)\\propto e^{{-{round(fit_results$alpha, 3)}}}$")`。
