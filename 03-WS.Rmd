@@ -39,7 +39,7 @@ generate_ws_edges <- function(n, m, p) {
 }
 ```
 
-我们设定节点数$N$为100，邻居数目$m$为2，重连概率$p$为从[0.001, 1]区间中对数等距选取的15个（见表\@ref(tab:config-ws)），以此根据Watts-Strogatz模型生成15种小世界网络。
+我们设定节点数$N$为100，邻居数目$m$为2，重连概率$p$为从[0.001, 1]区间中对数等距选取的15个，以此根据Watts-Strogatz模型生成15种小世界网络。对于每一种网络，我们都生成了50个网络，图\@ref(fig:plot-ws)中可视化了每一种配置中的一个样例网络。
 
 ```{r config-ws}
 set.seed(20191124)
@@ -53,12 +53,6 @@ ws_config <- tibble(
   m = 2,
   p = logspace(-3, 0, n_networks)
 )
-ws_config %>%
-  knitr::kable(
-    digits = 4,
-    col.names = c("编号", "$N$", "$m$", "$p$"),
-    caption = "小世界网络配置"
-  )
 ```
 
 ```{r generate-ws, cache=TRUE}
@@ -83,9 +77,7 @@ ws_graphs <- ws_config %>%
   )
 ```
 
-对于每一种配置，我们都生成了`r n_rep`个网络，图\@ref(fig:plot-ws)中可视化了每一种配置中的一个样例网络。
-
-```{r plot-ws, fig.cap="Watts-Strogatz模型小世界网络可视化（$N=100,m=2$）"}
+```{r plot-ws, fig.width=6, fig.height=4, fig.cap="Watts-Strogatz模型小世界网络可视化（$N=100,m=2$）"}
 par(mar = c(0, 0, 2, 0) + 0.1, mfrow = c(3, 5))
 for (i_graph in 1:n_networks) {
   plot(
@@ -102,7 +94,7 @@ for (i_graph in 1:n_networks) {
 
 图\@ref(fig:plot-smallworldness)中展示了`r n_rep`次随机生成的Watts-Strogatz模型网络的平均小世界性质相关情况。
 
-```{r plot-smallworldness, fig.cap="Watts-Strogatz模型的小世界性质（$N=100, m=2$）。A：相对集聚系数和平均距离随着重连概率的变化趋势；B：小世界性质随着重连概率的变化趋势。"}
+```{r plot-smallworldness, fig.width=6, fig.height=4, fig.cap="Watts-Strogatz模型的小世界性质（$N=100, m=2$）。A：相对集聚系数和平均距离随着重连概率的变化趋势；B：小世界性质随着重连概率的变化趋势。"}
 C0 <- transitivity(ring_graph, "average")
 d0 <- mean_distance(ring_graph)
 graph_stats <- ws_graphs %>%
