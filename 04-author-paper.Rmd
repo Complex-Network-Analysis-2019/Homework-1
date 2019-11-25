@@ -38,7 +38,7 @@ author_graph <- delete_vertices(
 par(mar = c(0, 0, 0, 0) + 0.1)
 plot(
   author_graph,
-  layout = layout_nicely,
+  layout = layout_with_kk,
   vertex.color = "black",
   vertex.size = 1,
   vertex.label = NA,
