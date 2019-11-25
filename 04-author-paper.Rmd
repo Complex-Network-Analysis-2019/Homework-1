@@ -46,7 +46,7 @@ plot(
 )
 ```
 
-再看看这个网络的度分布情况，图\@ref(fig:degree-distribution-author)分别给出了再原始坐标轴和双对数坐标轴下的度分布图。根据双对数情况下的分布图，可以大致看出来图形呈一条直线，因此基本适合进行幂律分布拟合。
+图\@ref(fig:degree-distribution-author)分别给出了在原始坐标轴和双对数坐标轴下的度分布图。根据双对数情况下的分布图，可以大致看出来图形呈一条直线，因此基本适合进行幂律分布拟合。
 
 ```{r degree-distribution-author, fig.cap="度分布图。A：原始坐标轴；B：双对数坐标轴。"}
 deg_dis <- tibble(
@@ -70,7 +70,7 @@ plot_grid(
 )
 ```
 
-最后，情况符合预期。我们去掉了度分布值中度为0的数据，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法进行幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。
+最后，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法对网络的度分布做幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。
 
 ```{r fit-power-law}
 fit_results <- fit_power_law(fit_power_law(deg_dis$freq)) %>%
