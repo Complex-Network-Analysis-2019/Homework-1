@@ -58,11 +58,11 @@ plot_grid(
   ggplot(deg_dis, aes(k, freq)) +
     geom_point(color = "lightblue") +
     labs(y = expression(P(k))) +
-    theme_few(base_family = "Arial"),
+    theme_few(),
   ggplot(deg_dis, aes(k, freq)) +
     geom_point(color = "lightblue") +
     labs(y = expression(paste(log[10], P(k), sep = ""))) +
-    theme_few(base_family = "Arial") +
+    theme_few() +
     scale_x_log10() +
     scale_y_log10(),
   ncol = 1,
