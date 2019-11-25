@@ -73,7 +73,7 @@ plot_grid(
 最后，采用Clauset、Shalizi和Newman三人在2009年的文章中提到的方法对网络的度分布做幂律拟合，表\@ref(tab:fit-power-law)中给出了拟合的结果。
 
 ```{r fit-power-law}
-fit_results <- fit_power_law(fit_power_law(deg_dis$freq)) %>%
+fit_results <- fit_power_law(deg_dis$freq) %>%
   as_tibble()
 fit_results %>%
   select(alpha, logLik, KS.p) %>%
