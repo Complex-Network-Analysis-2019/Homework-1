@@ -79,9 +79,9 @@ fit_results %>%
   select(alpha, logLik, KS.p) %>%
   knitr::kable(
     digits = 3,
-    col.names = c("$\\lambda$", "log likelihood", "$p$"),
+    col.names = c("$\\gamma$", "log likelihood", "$p$"),
     caption = "幂律拟合统计结果小结"
   )
 ```
 
-注意到$p$值大于0.05，从统计意义上看，模型的拟合结果很好。也就是说经济物理学家合作网的度分布服从$\lambda$值为`r round(fit_results$alpha, 3)`的幂律分布。
+注意到$p$值大于0.05，从统计意义上看，模型的拟合结果很好。所以，经济物理学家合作网的度分布服从$\gamma$值为`r round(fit_results$alpha, 3)`的幂律分布，即`r str_glue("$P(k)\\propto e^{{-{round(fit_results$alpha, 3)}}}$")`。
