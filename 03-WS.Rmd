@@ -83,7 +83,24 @@ ws_graphs <- ws_config %>%
   )
 ```
 
-图\@ref(fig:plot-smallworldness)中展示了`r n_rep`次随机生成的Watts-Strogatz模型网络的小世界性质相关情况。
+对于每一种配置，我们都生成了`r n_rep`个网络，图\@ref(fig:plot-ws)中可视化了每一种配置中的一个样例网络。
+
+```{r plot-ws, fig.cap="Watts-Strogatz模型小世界网络可视化（$N=100,m=2$）"}
+par(mar = c(0, 0, 2, 0) + 0.1, mfrow = c(3, 5))
+for (i_graph in 1:n_networks) {
+  plot(
+    ws_graphs$ws[[i_graph]],
+    layout = layout_in_circle,
+    vertex.color = "black",
+    vertex.size = 1,
+    vertex.label = NA,
+    edge.curved = 0,
+    main = str_c("p = ", round(ws_graphs$p[i_graph], 4))
+  )
+}
+```
+
+图\@ref(fig:plot-smallworldness)中展示了`r n_rep`次随机生成的Watts-Strogatz模型网络的平均小世界性质相关情况。
 
 ```{r plot-smallworldness, fig.cap="Watts-Strogatz模型的小世界性质（$N=100, m=2$）。A：相对集聚系数和平均距离随着重连概率的变化趋势；B：小世界性质随着重连概率的变化趋势。"}
 C0 <- transitivity(ring_graph, "average")
