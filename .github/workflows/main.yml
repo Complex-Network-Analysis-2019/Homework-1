@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@master
       - name: Get Version
         id: get_ver
-        run: echo ::set-output name=tag::$(echo GITHUB_REF | cut -b 11-)
+        run: echo ::set-output name=tag::$(echo $GITHUB_REF | cut -b 11-)
       - name: Install Package Dependencies
         run: |-
           Rscript -e "install.packages('remotes', repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
