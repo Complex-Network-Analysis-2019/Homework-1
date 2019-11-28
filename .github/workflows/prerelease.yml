@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@master
       - name: Get Branch Name
         id: get_branch
-        run: echo ::set-output name=branch::$(echo $GITHUB_REF | cut -b 12-)
+        run: echo ::set-output name=branch::$(echo $(echo $GITHUB_REF | cut -b 12-)".beta")
       - name: Install Package Dependencies
         run: |-
           Rscript -e "install.packages('remotes', repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
