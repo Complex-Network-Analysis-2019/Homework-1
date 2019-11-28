@@ -2,6 +2,7 @@ name: Test on Reports rendering
 'on':
   push:
     branches:
+      - '**'
       - '!master'
       - '!release/*'
 jobs:
