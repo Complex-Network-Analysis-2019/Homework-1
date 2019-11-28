@@ -1,14 +1,17 @@
 name: Render and Release Bookdown Reports
 'on':
   push:
-    branches:
-      - 'master'
+    tags:
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@master
+      - name: Get Version
+        id: get_ver
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
       - name: Install Package Dependencies
         run: |-
           Rscript -e "install.packages('remotes', repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
@@ -22,8 +25,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.get_ver.outputs.tag }}
+          release_name: Release ${{ steps.get_ver.outputs.tag }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
