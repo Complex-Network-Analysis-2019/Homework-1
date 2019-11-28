@@ -13,7 +13,8 @@ jobs:
         run: |-
           Rscript -e "install.packages('remotes', repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
           Rscript -e "remotes::install_deps(dependencies = TRUE, repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
-      - run: |-
+      - name: Render the report
+        run: |-
           Rscript -e "bookdown::render_book('index.Rmd')"
       - name: Create Pre-release
         id: create_pre_release
