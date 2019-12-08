@@ -5,31 +5,42 @@
 下面我们将针对经济物理学家合作网的度分布进行幂律拟合。
 
 ```{r setup-author}
-paper_authors <- read_tsv(
+papers_authors <- read_tsv(
   "datasets/经济物理学家合作网络/paperID_authorID.txt",
   col_names = c("paper_id", "author_id")
-)
-author_edges <- tibble()
-papers <- unique(paper_authors$paper_id)
+) %>%
+  # index of 0 is not supported in R
+  mutate_all(~ . + 1)
+num_authors <- n_distinct(papers_authors$author_id)
+author_matrix <- matrix(0, num_authors, num_authors)
+# get matrix values
+papers <- unique(papers_authors$paper_id)
+authors_coop <- tibble()
 for (paper in papers) {
-  authors <- paper_authors %>%
-    filter(paper_id == paper) %>%
-    pull(author_id)
-  if (length(authors) > 1) {
-    author_subgraph <- expand_grid(n1 = authors, n2 = authors) %>%
-      filter(n1 < n2)
-    author_edges <- bind_rows(author_edges, author_subgraph)
-  }
+  paper_authors <- filter(papers_authors, paper_id == paper)
+  if (nrow(paper_authors) <= 1)
+    next
+  paper_coop <- expand_grid(
+    author1 = paper_authors$author_id,
+    author2 = paper_authors$author_id
+  ) %>%
+    filter(author1 != author2) %>%
+    add_column(n = 1)
+  authors_coop <- bind_rows(authors_coop, paper_coop)
 }
-author_edges <- unique(author_edges) %>%
-  # igraph does not allow vertex id to be zero, all plus 1
-  mutate_all(~ . + 1) %>%
-  as.matrix()
-author_graph <- graph_from_edgelist(author_edges, directed = FALSE)
-author_graph <- delete_vertices(
-  simplify(author_graph),
-  which(degree(author_graph) == 0)
-)
+authors_coop <- authors_coop %>%
+  group_by(author1, author2) %>%
+  summarise(n = sum(n)) %>%
+  ungroup()
+# construct a non-weighted adjacency matrix
+author_matrix[as.matrix(select(authors_coop, starts_with("author")))] <- 1
+author_graph_raw <- graph_from_adjacency_matrix(author_matrix, "undirected")
+# find the largest connected components
+author_graph <- decompose(author_graph_raw) %>%
+  enframe(name = "id", value = "graph") %>%
+  mutate(num_vertices = map_dbl(graph, vcount)) %>%
+  filter(num_vertices == max(num_vertices)) %>%
+  pluck("graph", 1)
 ```
 
 图\@ref(fig:visualize-author)给出了经济物理学家合作网的可视化结果（已去除孤立节点，即度为0的节点，下同）。
