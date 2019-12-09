@@ -43,7 +43,7 @@ author_graph <- decompose(author_graph_raw) %>%
   pluck("graph", 1)
 ```
 
-图\@ref(fig:visualize-author)给出了经济物理学家合作网的可视化结果（已去除孤立节点，即度为0的节点，下同）。
+在创建经济物理学家合作网时，我们定义只要两个科学家有过合著一篇文章则表示两者之间有一条连边。这样构造出网络后，我们又找出了其最大连通集团。图\@ref(fig:visualize-author)给出了该最大连通集团的可视化结果（其中包含`r vcount(author_graph)`位科学家）。
 
 ```{r visualize-author, fig.width=6, fig.height=6, fig.cap="经济物理学家合作网可视化"}
 par(mar = c(0, 0, 0, 0) + 0.1)
