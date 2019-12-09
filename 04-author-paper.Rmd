@@ -13,7 +13,7 @@ papers_authors <- read_tsv(
   mutate_all(~ . + 1)
 num_authors <- n_distinct(papers_authors$author_id)
 author_matrix <- matrix(0, num_authors, num_authors)
-# get matrix values
+# get the number of cooperation papers for each pair of authors
 papers <- unique(papers_authors$paper_id)
 authors_coop <- tibble()
 for (paper in papers) {
